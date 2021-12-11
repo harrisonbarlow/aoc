@@ -53,7 +53,7 @@ def main():
     heights = list(map(list, open("input.txt").read().rstrip().split("\n")))
 
     print(solve1(pad(heights, 10)))
-    print(s(pad(heights, 9)))
+    print(solve2(pad(heights, 9)))
 
 
 if __name__ == "__main__":
