@@ -66,8 +66,8 @@ def solve1(octo, steps):
     counter = 0
 
     for s in range(steps):
-
         flashed = dict()
+        
         for y in range(1, len(octo) - 1):
             for x in range(1, len(octo[y]) - 1):
                 octo[y][x] += 1

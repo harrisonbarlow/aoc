@@ -1,36 +1,38 @@
 import math
 
-d = dict()
+s = set()
 def f(h, y, x):
-  if h[y][x] != 9 and (y,x) not in d:
-    d[(y,x)] = True
-    return 1 + f(h,y-1,x)+f(h,y+1,x)+f(h,y,x-1)+f(h,y,x+1)
+  if h[y][x] != 9 and (y,x) not in s:
+    s.add((y,x))
+    return 1+f(h,y-1,x)+f(h,y+1,x)+f(h,y,x-1)+f(h,y,x+1)
   else:
     return 0
 
-def s(h):
-  s = set()
+
+def a(h):
+  b = set()
   for y in range(1, len(h) -1):
     for x in range(1, len(h[y]) - 1):
-      s.add(f(h, y, x))
-  return math.prod(list(s)[-3:])
+      b.add(f(h, y, x))
+  return math.prod(list(b)[-3:])
 
-def pad(array, pad):
-  newarray = []
 
-  for line in array:
-    newarray.append([pad] + [int(c) for c in line] + [pad])
+def p(a, n):
+  b = []
 
-  xlen = len(newarray[0])
-  row = [pad] * xlen
-  newarray = [row] + newarray + [row]
+  for l in a:
+    b.append([n] + [int(c) for c in l] + [n])
 
-  return newarray
+  m = len(b[0])
+  r = [n] * m
+  b = [r] + b + [r]
+
+  return b
+
 
 def main():
-  heights = list(map(list, open("input.txt").read().rstrip().split("\n")))
-
-  print(s(pad(heights, 9)))
+  h = list(map(list, open("input.txt").read().rstrip().split("\n")))
+  print(a(p(h, 9)))
 
 
 if __name__ == "__main__":
