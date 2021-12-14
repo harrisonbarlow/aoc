@@ -37,7 +37,7 @@ def solve(template, rules, steps):
     for _ in range(steps):
         newpaircounts = defaultdict(int)
 
-        for pairs in list(paircounts.keys()):
+        for pairs in paircounts.keys():
             count = paircounts[pairs]
             insert = rules[pairs]
 
