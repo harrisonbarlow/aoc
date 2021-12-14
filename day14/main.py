@@ -12,48 +12,8 @@ def find_min(array):
 
     return array.count(m)
 
-
-def solve2(template, rules, steps):
-    counts = defaultdict(int)
-    
-    for i in range(len(template)):
-        if i == 0:
-            continue
-
-        counts[template[i - 1] + template[i]] += 1
-
-    for _ in range(steps):
-
-        print(counts)
-
-        newcounts = defaultdict(int)
-
-        for pairs in list(counts.keys()):
-            val = counts[pairs]
-            char = rules[pairs]
-
-            newcounts[pairs[0] + char] += val
-            newcounts[char + pairs[1]] += val
-
-        counts = newcounts
-
-    histogram = defaultdict(int)
-
-    for count in counts.keys():
-        first = count[0]
-        second = count[1]
-
-        histogram[first] += counts[count]
-
-    print(histogram)
-
-    return (max(histogram.values()) -  min(histogram.values()) + 1)
-
-
-
 def solve1(template, rules, steps):
     for _ in range(steps):
-        #print(f"Step {_}: {template}")
         new_template = []
         for i, val in enumerate(list(template)):
             if i == 0:
@@ -67,8 +27,33 @@ def solve1(template, rules, steps):
     return find_max(template) - find_min(template)
 
 
+def solve(template, rules, steps):
+    paircounts = defaultdict(int)
+    lettercounts = defaultdict(int)
+    
+    for i in range(1, len(template)):
+        paircounts[template[i - 1] + template[i]] += 1
+
+    for _ in range(steps):
+        newpaircounts = defaultdict(int)
+
+        for pairs in list(paircounts.keys()):
+            count = paircounts[pairs]
+            insert = rules[pairs]
+
+            newpaircounts[pairs[0] + insert] += count
+            newpaircounts[insert + pairs[1]] += count
+
+        paircounts = newpaircounts
+
+    for count in paircounts.keys():
+        first = count[0]
+        lettercounts[first] += paircounts[count]
+
+    return max(lettercounts.values()) -  min(lettercounts.values()) + 1
+
+
 def main():
-    template = ""
     rules = dict()
     for index, line in enumerate(open("input.txt").readlines()):
         if index == 0:
@@ -77,12 +62,11 @@ def main():
         if line == "\n":
             continue
         
-
         rule = line.rstrip().split(" -> ")
         rules[rule[0]] = rule[1]
 
-    #print(solve1(template, rules, 40))
-    print(solve2(template, rules, 40))
+    print(solve(template, rules, 10))
+    print(solve(template, rules, 40))
 
 
 if __name__ == "__main__":
