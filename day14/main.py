@@ -1,21 +1,20 @@
 from collections import defaultdict
-from time import sleep
+from time import perf_counter
 
 def find_max(array):
     m = max(set(array), key=array.count)
-
     return array.count(m)
 
 
 def find_min(array):
     m = min(set(array), key=array.count)
-
     return array.count(m)
+
 
 def solve1(template, rules, steps):
     for _ in range(steps):
         new_template = []
-        for i, val in enumerate(list(template)):
+        for i, _ in enumerate(list(template)):
             if i == 0:
                 continue
 
@@ -28,29 +27,28 @@ def solve1(template, rules, steps):
 
 
 def solve(template, rules, steps):
-    paircounts = defaultdict(int)
-    lettercounts = defaultdict(int)
+    pair_counts = defaultdict(int)
+    letter_counts = defaultdict(int)
     
     for i in range(1, len(template)):
-        paircounts[template[i - 1] + template[i]] += 1
+        pair_counts[template[i - 1] + template[i]] += 1
 
     for _ in range(steps):
-        newpaircounts = defaultdict(int)
+        new_pair_counts = defaultdict(int)
 
-        for pairs in paircounts.keys():
-            count = paircounts[pairs]
+        for pairs, count in pair_counts.items():
             insert = rules[pairs]
 
-            newpaircounts[pairs[0] + insert] += count
-            newpaircounts[insert + pairs[1]] += count
+            new_pair_counts[pairs[0] + insert] += count
+            new_pair_counts[insert + pairs[1]] += count
 
-        paircounts = newpaircounts
+        pair_counts = new_pair_counts
 
-    for count in paircounts.keys():
-        first = count[0]
-        lettercounts[first] += paircounts[count]
+    for pairs, count in pair_counts.items():
+        first = pairs[0]
+        letter_counts[first] += count
 
-    return max(lettercounts.values()) -  min(lettercounts.values()) + 1
+    return max(letter_counts.values()) -  min(letter_counts.values()) + 1
 
 
 def main():
@@ -67,7 +65,6 @@ def main():
 
     print(solve(template, rules, 10))
     print(solve(template, rules, 40))
-
 
 if __name__ == "__main__":
     main()
