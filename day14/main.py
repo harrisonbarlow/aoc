@@ -1,61 +1,20 @@
 from collections import defaultdict
-from time import sleep
+from time import perf_counter
 
 def find_max(array):
     m = max(set(array), key=array.count)
-
     return array.count(m)
 
 
 def find_min(array):
     m = min(set(array), key=array.count)
-
     return array.count(m)
-
-
-def solve2(template, rules, steps):
-    counts = defaultdict(int)
-    
-    for i in range(len(template)):
-        if i == 0:
-            continue
-
-        counts[template[i - 1] + template[i]] += 1
-
-    for _ in range(steps):
-
-        print(counts)
-
-        newcounts = defaultdict(int)
-
-        for pairs in list(counts.keys()):
-            val = counts[pairs]
-            char = rules[pairs]
-
-            newcounts[pairs[0] + char] += val
-            newcounts[char + pairs[1]] += val
-
-        counts = newcounts
-
-    histogram = defaultdict(int)
-
-    for count in counts.keys():
-        first = count[0]
-        second = count[1]
-
-        histogram[first] += counts[count]
-
-    print(histogram)
-
-    return (max(histogram.values()) -  min(histogram.values()) + 1)
-
 
 
 def solve1(template, rules, steps):
     for _ in range(steps):
-        #print(f"Step {_}: {template}")
         new_template = []
-        for i, val in enumerate(list(template)):
+        for i, _ in enumerate(list(template)):
             if i == 0:
                 continue
 
@@ -67,8 +26,32 @@ def solve1(template, rules, steps):
     return find_max(template) - find_min(template)
 
 
+def solve(template, rules, steps):
+    pair_counts = defaultdict(int)
+    letter_counts = defaultdict(int)
+    
+    for i in range(1, len(template)):
+        pair_counts[template[i - 1] + template[i]] += 1
+
+    for _ in range(steps):
+        new_pair_counts = defaultdict(int)
+
+        for pairs, count in pair_counts.items():
+            insert = rules[pairs]
+
+            new_pair_counts[pairs[0] + insert] += count
+            new_pair_counts[insert + pairs[1]] += count
+
+        pair_counts = new_pair_counts
+
+    for pairs, count in pair_counts.items():
+        first = pairs[0]
+        letter_counts[first] += count
+
+    return max(letter_counts.values()) -  min(letter_counts.values()) + 1
+
+
 def main():
-    template = ""
     rules = dict()
     for index, line in enumerate(open("input.txt").readlines()):
         if index == 0:
@@ -77,13 +60,11 @@ def main():
         if line == "\n":
             continue
         
-
         rule = line.rstrip().split(" -> ")
         rules[rule[0]] = rule[1]
 
-    #print(solve1(template, rules, 40))
-    print(solve2(template, rules, 40))
-
+    print(solve(template, rules, 10))
+    print(solve(template, rules, 40))
 
 if __name__ == "__main__":
     main()
