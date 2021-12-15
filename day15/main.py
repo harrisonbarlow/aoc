@@ -1,52 +1,41 @@
 from math import inf
-from collections import defaultdict
+from copy import deepcopy
 from queue import PriorityQueue
+from collections import defaultdict
 
 
 class Graph():
     def __init__(self, grid):
         self._graph = defaultdict(dict)
-        self._build(self._pad(grid, inf))
+        self._build(grid)
+
 
     def _build(self, grid):
-        for y in range(1, len(grid) - 1):
-            for x in range(1, len(grid[y]) - 1):
-                self._graph[(y, x)][(y - 1, x)] = grid[y - 1][x]
-                self._graph[(y, x)][(y + 1, x)] = grid[y + 1][x]
-                self._graph[(y, x)][(y, x - 1)] = grid[y][x - 1]
-                self._graph[(y, x)][(y, x + 1)] = grid[y][x + 1]
-
-
-    def _pad(self, array, pad):
-        newarray = []
-
-        for line in array:
-            newarray.append([pad] + [int(c) for c in line] + [pad])
-
-        xlen = len(newarray[0])
-        row = [pad] * xlen
-        newarray = [row] + newarray + [row]
-
-        return newarray
+        h, w = len(grid), len(grid[0])
+        for y in range(0, h):
+            for x in range(0, w):
+                for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+                    nx, ny = (x + dx, y + dy)
+                    if 0 <= nx < w and 0 <= ny < h:
+                        self._graph[(y, x)][(ny, nx)] = grid[ny][nx]
 
 
     def find_shortest(self, start, end):
         visited = set()
-        distances = { v: inf for v in self._graph }
-        distances[start] = 0
+        distances = defaultdict(lambda: inf, {start: 0})
 
         pq = PriorityQueue()
         pq.put((0, start))
 
         while not pq.empty():
-            (dist, current) = pq.get()
+            (current_dist, current) = pq.get()
             visited.add(current)
 
             for neighbour in self._graph[current]:
-                if self._graph[current][neighbour] != inf and neighbour not in visited:
+                if neighbour not in visited:
                     distance = self._graph[current][neighbour]
                     old_cost = distances[neighbour]
-                    new_cost = distances[current] + distance
+                    new_cost = current_dist + distance
                     
                     if new_cost < old_cost:
                         pq.put((new_cost, neighbour))
@@ -55,55 +44,32 @@ class Graph():
         return distances[end]
 
 
-def increment_grid(grid, number):
-    new_grid = grid.copy()
-    
-    for y in grid:
-        for x in y:
-            new_grid[y][x] += number
+def transform(grid):
+    h, w = len(grid), len(grid[0])
 
-            if new_grid[y][x] > 9:
-                new_grid[y][x] = new_grid[y][x] - 9
+    for row in grid:
+        for i in range(1, 5):
+            row.extend([row[x] + i  if row[x] + i <= 9 else row[x] + i - 9 for x in range(w)])
 
-    return new_grid
-
-
-def increment_row(row, risk):
-    new_row = row.copy()
-
-    for x in range(len(row)):
-        new_row[x] += risk
-
-        if new_row[x] > 9:
-            new_row[x] = new_row[x] - 9
-
-    return new_row
-
-
-def transform_grid(grid):
-    new_rows = []
-    new_grid = []
-
-    for y in grid:
-        new_rows.append(y + increment_row(y, 1) + increment_row(y, 2) + increment_row(y, 3) + increment_row(y, 4))
-
-    for i in range(5):
-        for y in new_rows:
-            new_grid.append(increment_row(y, i))
-
-    return new_grid
+    for i in range(1, 5):
+        for row in range(h):
+            grid.append([x + i if x + i <= 9 else x + i - 9 for x in grid[row]])
         
+    return grid
 
 
 def main():
-    grid = [[int(x) for x in y] for y in [l.rstrip() for l in open("input.txt").readlines()]]
-    new_grid = transform_grid(grid)
+    grid_1 = [[int(x) for x in y] for y in [l.rstrip() for l in open("input.txt").readlines()]]
+    grid_2 = transform(deepcopy(grid_1))
 
-    graph = Graph(grid)
-    graph_2 = Graph(new_grid)
+    graph_1 = Graph(grid_1)
+    graph_2 = Graph(grid_2)
 
-    print(graph.find_shortest((1, 1), (len(grid), len(grid[0]))))
-    print(graph_2.find_shortest((1, 1), (len(new_grid), len(new_grid[0]))))
+    h_1, w_1 = len(grid_1) - 1, len(grid_1[0]) - 1
+    h_2, w_2 = len(grid_2) - 1, len(grid_2[0]) - 1
+
+    print(graph_1.find_shortest((0, 0), (h_1, w_1)))
+    print(graph_2.find_shortest((0, 0), (h_2, w_2)))
 
 
 if __name__ == "__main__":
