@@ -43,15 +43,14 @@ class Graph():
             visited.add(current)
 
             for neighbour in self._graph[current]:
-                if self._graph[current][neighbour] != inf:
+                if self._graph[current][neighbour] != inf and neighbour not in visited:
                     distance = self._graph[current][neighbour]
-
-                    if neighbour not in visited:
-                        old_cost = distances[neighbour]
-                        new_cost = distances[current] + distance
-                        if new_cost < old_cost:
-                            pq.put((new_cost, neighbour))
-                            distances[neighbour] = new_cost
+                    old_cost = distances[neighbour]
+                    new_cost = distances[current] + distance
+                    
+                    if new_cost < old_cost:
+                        pq.put((new_cost, neighbour))
+                        distances[neighbour] = new_cost
 
         return distances[end]
 
