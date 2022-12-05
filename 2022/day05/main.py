@@ -1,8 +1,8 @@
 from copy import deepcopy
 from collections import defaultdict
 
-def solve2(stacks, input_procedure):
-    for procedure in input_procedure.split('\n'):
+def solve2(stacks, procedures):
+    for procedure in procedures.split('\n'):
         _, move, _, fr, _, to = procedure.split(' ')
 
         temp = []
@@ -15,8 +15,8 @@ def solve2(stacks, input_procedure):
     return ''.join([stacks[stack][-1] for stack in stacks])
 
 
-def solve1(stacks, input_procedure):
-    for procedure in input_procedure.split('\n'):
+def solve1(stacks, procedures):
+    for procedure in procedures.split('\n'):
         _, move, _, fr, _, to = procedure.split(' ')
 
         for _ in range(int(move)):
@@ -27,7 +27,7 @@ def solve1(stacks, input_procedure):
 
 def main():
     with open('input.txt') as f:
-        stacks_input, procedure = f.read().split('\n\n')
+        stacks_input, procedures = f.read().split('\n\n')
 
     stacks = defaultdict(list)
     
@@ -38,8 +38,8 @@ def main():
             if row[j] != ' ':
                 stacks[str(i + 1)].append(row[j])
 
-    print(solve1(deepcopy(stacks), procedure))
-    print(solve2(deepcopy(stacks), procedure))
+    print(solve1(deepcopy(stacks), procedures))
+    print(solve2(deepcopy(stacks), procedures))
 
 
 if __name__ == "__main__":
