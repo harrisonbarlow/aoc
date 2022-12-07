@@ -9,6 +9,5 @@ def main():
     print(solve(stream, 4))
     print(solve(stream, 14))
 
-
 if __name__ == "__main__":
     main()
