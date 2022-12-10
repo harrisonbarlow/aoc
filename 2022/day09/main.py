@@ -1,5 +1,4 @@
 import numpy as np
-from operator import add
 
 def solve(steps, length):
     dirs = {
@@ -12,7 +11,7 @@ def solve(steps, length):
     visited = set()
     knots = [np.array([0, 0]) for _ in range(length)]
 
-    for [dir, step] in steps:
+    for dir, step in steps:
         for _ in range(int(step)):
             knots[0] += dirs[dir]
 
