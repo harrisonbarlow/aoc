@@ -1,4 +1,3 @@
-
 def solve2(input):
     x = 1
     hpos = 0
@@ -23,7 +22,6 @@ def solve2(input):
             x += int(instruction[1])
 
     return display
-
 
 
 def solve1(input):

@@ -1,15 +1,9 @@
 import numpy as np
 
 def solve(steps, length):
-    dirs = {
-        'U': [0, 1],
-        'D': [0, -1],
-        'L': [-1 ,0],
-        'R': [1, 0]
-    }
-
     visited = set()
     knots = [np.array([0, 0]) for _ in range(length)]
+    dirs = {'U': [0, 1], 'D': [0, -1], 'L': [-1 ,0], 'R': [1, 0]}
 
     for dir, step in steps:
         for _ in range(int(step)):
@@ -17,7 +11,7 @@ def solve(steps, length):
 
             for prev, curr in zip(knots, knots[1:]):
                 if max(abs(prev - curr)) > 1:
-                    curr += np.clip((prev - curr), -1, 1)
+                    curr += np.sign(prev - curr)
 
             visited.add(tuple(knots[-1]))
 
