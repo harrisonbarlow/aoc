@@ -1,10 +1,9 @@
-import math
-import json
 
 from math import prod
 from time import sleep
-from operator import add, mul, mod
+from operator import add, mul, floordiv, mod
 from functools import partial
+from collections import deque
 
 
 def debug(monkeys):
@@ -12,34 +11,75 @@ def debug(monkeys):
         print(index, monkey['items'])
     sleep(1)
 
-def solve1(monkeys):
-    for _ in range(20):
-        for index, monkey in enumerate(monkeys):
-            monkey['items'] = list(map(monkey['operation'], monkey['items']))
-            monkey['items'] = list(map(lambda x: x // 3, monkey['items']))
 
-            for item in monkey['items']:
+def solve2(monkeys, rounds, testprod):
+    for _ in range(rounds):
+        for monkey in monkeys:
+            for item in map(monkey['operation'], monkey['items']):
                 monkey['count'] += 1
 
-                print(item, monkey['test'](item))
-                if monkey['test'](item):
+                item %= testprod
+
+                if item % monkey['test'] == 0:
                     monkeys[monkey['true']]['items'].append(item)
-                    print(f"Throwing {item} to {monkey['true']}")
                 else:
                     monkeys[monkey['false']]['items'].append(item)
-                    print(f"Throwing {item} to {monkey['false']}")
 
             monkey['items'] = []
 
-        debug(monkeys)
-
-    #print(list(reversed(sorted([monkey['count'] for monkey in monkeys])))[0:2])
-    print(list(reversed(sorted([monkey['count'] for monkey in monkeys]))))
-    return prod(list(reversed(sorted([monkey['count'] for monkey in monkeys])))[0:2])
+    return prod(list(sorted([monkey['count'] for monkey in monkeys]))[-2:])
 
 
-def square(n):
-    return n * n
+def solve1(monkeys, rounds):
+    for _ in range(rounds):
+        #debug(monkeys)
+        for monkey in monkeys:
+            for item in map(monkey['operation'], monkey['items']):
+                monkey['count'] += 1
+
+                item = item // 3
+
+                if item % monkey['test'] == 0:
+                    monkeys[monkey['true']]['items'].append(item)
+                else:
+                    monkeys[monkey['false']]['items'].append(item)
+
+            monkey['items'] = []
+
+    return prod(list(sorted([monkey['count'] for monkey in monkeys]))[-2:])
+
+
+def solve(monkeys, rounds, op, number):
+    for _ in range(rounds):
+        #debug(monkeys)
+        for monkey in monkeys:
+            for item in map(monkey['operation'], monkey['items']):
+                monkey['count'] += 1
+
+                item = op(item, number)
+
+                if item % monkey['test'] == 0:
+                    monkeys[monkey['true']]['items'].append(item)
+                else:
+                    monkeys[monkey['false']]['items'].append(item)
+
+            monkey['items'] = []
+
+    return prod(list(sorted([monkey['count'] for monkey in monkeys]))[-2:])
+    # for _ in range(rounds):
+    #     #debug(monkeys)
+    #     for index, monkey in enumerate(monkeys):
+    #         while monkey['items']:
+    #             monkey['count'] += 1
+                
+    #             item = op(monkey['operation'](monkey['items'].popleft()), number)
+
+    #             if item % monkey['test'] == 0:
+    #                 monkeys[monkey['true']]['items'].append(item)
+    #             else:
+    #                 monkeys[monkey['false']]['items'].append(item)
+
+    # return prod(list(sorted([monkey['count'] for monkey in monkeys]))[-2:])
 
 
 def main():
@@ -48,8 +88,14 @@ def main():
     monkeys = []
 
     for lines in input:
-        monkey = {'count': 0}
-        monkey['items'] = list(map(int, lines[1].split(':')[1].split(',')))
+        monkey = {
+            'count': 0,
+            'items': deque(map(int, lines[1].split(':')[1].split(','))),
+            'test': int(lines[3].split()[-1]),
+            'true': int(lines[4].split()[-1]),
+            'false': int(lines[5].split()[-1]),
+        }
+
         operation = lines[2].split('=')[1].split()
 
         match operation[1]:
@@ -62,21 +108,14 @@ def main():
             case '+':
                 monkey['operation'] = partial(add, int(operation[2]))
 
-        test = lines[3].split()
-        test_num = int(test[-1])
-        monkey['test'] = lambda x: (x / test_num).is_integer()
-
-        true = lines[4].split()
-        monkey['true'] = int(true[-1])
-
-        false = lines[5].split()
-        monkey['false'] = int(false[-1])
-
-        #print(decision)
-
         monkeys.append(monkey)
 
-    print(solve1(monkeys))
+
+    lcm = prod([monkey['test'] for monkey in monkeys])
+
+
+    print(solve(monkeys, 20, floordiv, 3))
+    print(solve(monkeys, 10000, mod, lcm))
 
 if __name__ == "__main__":
     main()
