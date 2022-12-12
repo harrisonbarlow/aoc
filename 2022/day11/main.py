@@ -10,10 +10,8 @@ def solve(monkeys, rounds, op, number):
 
                 item = op(item, number)
 
-                if item % monkey['test'] == 0:
-                    monkeys[monkey['true']]['items'].append(item)
-                else:
-                    monkeys[monkey['false']]['items'].append(item)
+                dest = monkey['true'] if item % monkey['test'] == 0 else monkey['false']
+                monkeys[dest]['items'].append(item)
 
             monkey['items'] = []
 
