@@ -1,24 +1,23 @@
 from math import inf
-from copy import deepcopy
 from queue import PriorityQueue
 from collections import defaultdict
 
 
 class Graph():
     def __init__(self, grid):
-        self._graph = defaultdict(dict)
-        self._build(grid)
-
+        self._graph = self._build(grid)
 
     def _build(self, grid):
+        graph = defaultdict(dict)
         h, w = len(grid), len(grid[0])
+
         for y in range(0, h):
             for x in range(0, w):
-                for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
-                    nx, ny = (x + dx, y + dy)
-                    if 0 <= nx < w and 0 <= ny < h:
-                        self._graph[(y, x)][(ny, nx)] = inf if ord(grid[ny][nx]) - ord(grid[y][x]) > 1 else 1
-
+                for dy, dx in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+                    ny, nx = (y + dy, x + dx)
+                    if 0 <= ny < h and 0 <= nx < w:
+                        graph[(y, x)][(ny, nx)] = inf if ord(grid[ny][nx]) - ord(grid[y][x]) > 1 else 1
+        return graph
 
     def find_shortest(self, start, end):
         visited = set()
@@ -43,35 +42,15 @@ class Graph():
 
         return distances[end]
 
-def solve1(grid):
-    h, w = len(grid), len(grid[0])
-    for y in range(0, h):
-        for x in range(0, w):
-            if grid[y][x] == 'E':
-                end = (y, x)
-                grid[y][x] = 'z'
-            if grid[y][x] == 'S':
-                start = (y, x)
-                grid[y][x] = 'a'
 
-    graph = Graph(grid)
-
-    return graph.find_shortest(start, end)
+def solve1(grid, start, end):
+    return Graph(grid).find_shortest(start, end)
 
 
-def solve2(grid):
+def solve2(grid, end):
     shortest = []
-
-    h, w = len(grid), len(grid[0])
-    for y in range(0, h):
-        for x in range(0, w):
-            if grid[y][x] == 'E':
-                end = (y, x)
-                grid[y][x] = 'z'
-            if grid[y][x] == 'S':
-                grid[y][x] = 'a'
-
     graph = Graph(grid)
+    h, w = len(grid), len(grid[0])
 
     for y in range(0, h):
         for x in range(0, w):
@@ -83,9 +62,20 @@ def solve2(grid):
 
 def main():
     grid = [list(line.strip()) for line in open('input.txt')]
+    h, w = len(grid), len(grid[0])
+    
+    for y in range(0, h):
+        for x in range(0, w):
+            if grid[y][x] == 'S':
+                start = (y, x)
+                grid[y][x] = 'a'
 
-    print(solve1(deepcopy(grid)))
-    print(solve2(deepcopy(grid)))
+            if grid[y][x] == 'E':
+                end = (y, x)
+                grid[y][x] = 'z'
+
+    print(solve1(grid, start, end))
+    print(solve2(grid, end))
 
 
 if __name__ == "__main__":
