@@ -1,57 +1,46 @@
-from time import sleep
+from math import prod
+from functools import cmp_to_key
 
-
-def compare_lists(left_list, right_list):
-    #result = False
-    print(f"Comparing: {left_list} and {right_list}")
-    #sleep(1)
-
-    for left, right in zip(left_list, right_list):
-        if isinstance(left, int) and isinstance(right, int):
-            print(f"Comparing: {left} and {right}")
-            if left < right:
-                print("Right order")
-                return True
-            elif left > right:
-                print("Wrong order")
-                return False
-            else:
-                continue
-
-        if compare_lists(left if isinstance(left, list) else [left], right if isinstance(right, list) else [right]):
-            continue
-        else:
-            break
-                
-    else:
-        #- Left side ran out of items, so inputs are in the right order
-        #- Right side ran out of items, so inputs are not in the right order
-        if len(left_list) <= len(right_list):
-            return True
-
-    #print(f"Result was {result}")
-
-    return False
+def compare(left, right):
+    match left, right:
+        case int(), int():
+            return left - right
+        case list(), list():
+            for l, r in zip(left, right):
+                if (r := compare(l, r)) != 0:
+                    return r
+            return compare(len(left), len(right))
+        case int(), list():
+            return compare([left], right)
+        case list(), int():
+            return compare(left, [right])
 
 
 def solve1(packets):
-    correct = []
-    for index, (left, right) in enumerate(packets):
-        if compare_lists(left, right):
-            correct.append(index + 1)
-        print()
+    indices = []
+    for index, (left, right) in enumerate(zip(packets[::2], packets[1::2])):
+        if compare(left, right) < 0:
+            indices.append(index + 1)
 
-    print(correct)
+    return sum(indices)
 
-    return sum(correct)
+
+def solve2(packets):
+    indices = []
+    divider = [[[2]], [[6]]]
+
+    for index, packet in enumerate(sorted(divider + packets, key=cmp_to_key(compare))):
+        if packet in divider:
+            indices.append(index + 1)
+
+    return prod(indices)
 
 
 def main():
-    packets = [(eval(left.strip()), eval(right.strip())) for left, right in [pair.split() for pair in open('input2.txt').read().split('\n\n')]]
-
-    #print(packets)
+    packets = [eval(line) for line in open('input.txt').read().splitlines() if len(line)]
 
     print(solve1(packets))
+    print(solve2(packets))
 
 
 if __name__ == "__main__":
