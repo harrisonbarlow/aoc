@@ -1,48 +1,40 @@
-import sys
 import numpy as np
-from time import sleep
 from copy import deepcopy
 
-#np.set_printoptions(threshold=sys.maxsize, edgeitems=30, linewidth=100000)
 sand_pos = (0, 500)
 
+def add_sand(cave, max_y=None):
+    (y, x) = sand_pos
+    cave[y, x] = 'o'
 
-def move_sand(cave, y, x, max_y=None):
-    if max_y is not None:
-        if y > max_y:
-            raise IndexError
+    while True:
+        for (dy, dx) in [(1, 0), (1, -1), (1, 1)]:
+            if max_y is not None and y+dy > max_y:
+                raise IndexError
 
-    if cave[y+1, x] == '.':
-        cave[y+1, x] = 'o'
-        cave[y, x] = '.'
-        return move_sand(cave, y+1, x, max_y=max_y)
+            if cave[y+dy, x+dx] == '.':
+                cave[y+dy, x+dx] = 'o'
+                cave[y, x] = '.'
 
-    if cave[y+1, x-1] == '.':
-        cave[y+1, x-1] = 'o'
-        cave[y, x] = '.'
+                (y, x) = (y+dy, x+dx)
 
-        return move_sand(cave, y+1, x-1, max_y=max_y)
-
-    if cave[y+1, x+1] == '.':
-        cave[y+1, x+1] = 'o'
-        cave[y, x] = '.'
-
-        return move_sand(cave, y+1, x+1, max_y=max_y)
+                break
+        else:
+            break
 
     return cave
 
 
 def solve1(cave, max_y):
     index = 0
-    (y, x) = sand_pos
 
     while True:
         try:
-            cave[y, x] = 'o'
-            cave = move_sand(cave, y, x, max_y=max_y)
+            cave = add_sand(cave, max_y=max_y)
             index += 1
         except IndexError:
             break
+
     return index
 
 
@@ -51,9 +43,8 @@ def solve2(cave):
     (y, x) = sand_pos
 
     while True:
-        cave[y, x] = 'o'
         index += 1
-        cave = move_sand(cave, y, x)
+        cave = add_sand(cave)
 
         if cave[y, x] == 'o':
             break
@@ -61,11 +52,10 @@ def solve2(cave):
     return index
 
 
-
 def main():
     input = [line.split('->') for line in open('input.txt').read().splitlines()]
 
-    cave = np.full((10000, 10000), '.')
+    cave = np.full((1000, 1000), '.')
 
     max_y = 0
 
