@@ -4,22 +4,18 @@ from copy import deepcopy
 sand_pos = (0, 500)
 
 def add_sand(cave, max_y=None):
-    (y, x) = sand_pos
-    cave[y, x] = 'o'
+    y, x = sand_pos
 
     while True:
-        for (dy, dx) in [(1, 0), (1, -1), (1, 1)]:
-            if max_y is not None and y+dy > max_y:
+        for dy, dx in [(1, 0), (1, -1), (1, 1)]:
+            if max_y is not None and y + dy > max_y:
                 raise IndexError
 
-            if cave[y+dy, x+dx] == '.':
-                cave[y+dy, x+dx] = 'o'
-                cave[y, x] = '.'
-
-                (y, x) = (y+dy, x+dx)
-
+            if cave[y + dy, x + dx] == '.':
+                y, x = y + dy, x + dx
                 break
         else:
+            cave[y, x] = 'o'
             break
 
     return cave
@@ -40,39 +36,32 @@ def solve1(cave, max_y):
 
 def solve2(cave):
     index = 0
-    (y, x) = sand_pos
+    y, x = sand_pos
 
-    while True:
-        index += 1
+    while cave[y, x] != 'o':
         cave = add_sand(cave)
-
-        if cave[y, x] == 'o':
-            break
+        index += 1
         
     return index
 
 
 def main():
-    input = [line.split('->') for line in open('input.txt').read().splitlines()]
-
+    paths = [line.split('->') for line in open('input.txt').read().splitlines()]
     cave = np.full((1000, 1000), '.')
-
     max_y = 0
 
-    for path in input:
-        for start, end in zip(path, path[1:]):
-            start_x, start_y = map(int, start.split(','))
-            end_x, end_y = map(int, end.split(','))
+    for path in paths:
+        for p1, p2 in zip(path, path[1:]):
+            p1_x, p1_y = map(int, p1.split(','))
+            p2_x, p2_y = map(int, p2.split(','))
 
-            if start_y > max_y or end_y > max_y:
-                max_y = max(start_y, end_y)
+            max_y = max(p1_y, p2_y, max_y)
 
-            if start_x == end_x:
-                cave[min(start_y, end_y):max(start_y, end_y) + 1, start_x] = '#'
+            if p1_x == p2_x:
+                cave[min(p1_y, p2_y):max(p1_y, p2_y) + 1, p1_x] = '#'
 
-            if start_y == end_y:
-                cave[start_y, min(start_x, end_x):max(start_x, end_x) + 1,] = '#'
-
+            if p1_y == p2_y:
+                cave[p1_y, min(p1_x, p2_x):max(p1_x, p2_x) + 1] = '#'
 
     cave[max_y + 2, :] = '#'
 
