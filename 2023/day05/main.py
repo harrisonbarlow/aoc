@@ -32,8 +32,6 @@ def solve1(seeds, *maps):
 
 
 def main():
-    seeds, maps = [], []
-
     seeds, *maps = open('input.txt').read().split('\n\n')
 
     seeds = [int(num) for num in seeds.split(': ')[1].split()]
