@@ -1,8 +1,7 @@
+from functools import reduce
+
 def chain(start, *funcs):
-    res = start
-    for func in funcs:
-        res = func(res)
-    return res
+    return reduce(lambda res, func: func(res), funcs, start)
 
 
 def mapper(map):
@@ -22,10 +21,8 @@ def solve2(seeds, *maps):
         seed = seeds[i]
         count = seeds[i + 1]
 
-        print(seed, count)
-
-        # for j in range(seed, seed + count):
-        values.append(chain(seed, *maps))
+        for j in range(seed, seed + count):
+             values.append(chain(seed, *maps))
 
     return min(values)
 
@@ -36,18 +33,18 @@ def solve1(seeds, *maps):
 
 def main():
     seeds, maps = [], []
-    
-    for index, chunk in enumerate(open('input2.txt').read().split('\n\n')):
-        if index == 0:
-            seeds.extend([int(num) for num in chunk.split(': ')[1].split()])
-            continue
 
-        maps.append(
-            mapper([
-                [int(num) for num in line.split()]
-                for line in chunk.splitlines()[1:]
-            ])
-        )
+    seeds, *maps = open('input.txt').read().split('\n\n')
+
+    seeds = [int(num) for num in seeds.split(': ')[1].split()]
+
+    maps = [
+        mapper([
+            [int(num) for num in line.split()]
+            for line in chunk.splitlines()[1:]
+        ])
+        for chunk in maps
+    ]
 
     print(solve1(seeds, *maps))
     print(solve2(seeds, *maps))
