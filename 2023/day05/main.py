@@ -7,7 +7,7 @@ def chain(start, *funcs):
 def mapper(map):
     def func(number):
         for destination, source, length in map:
-            if source <= number <= source + length:
+            if source <= number < source + length:
                 return destination + (number - source)
             
         return number
@@ -16,15 +16,19 @@ def mapper(map):
 
 
 def solve2(seeds, *maps):
-    values = []
-    for i in range(0, len(seeds), 2):
-        seed = seeds[i]
-        count = seeds[i + 1]
+    location = 0
 
-        for j in range(seed, seed + count):
-             values.append(chain(seed, *maps))
+    while True:
+        possible_seed = chain(location, *maps)
 
-    return min(values)
+        for i in range(0, len(seeds), 2):
+            seed = seeds[i]
+            count = seeds[i + 1]
+
+            if seed <= possible_seed < seed + count:
+                return location
+
+        location += 1
 
 
 def solve1(seeds, *maps):
@@ -36,16 +40,26 @@ def main():
 
     seeds = [int(num) for num in seeds.split(': ')[1].split()]
 
-    maps = [
+    forward = [
         mapper([
-            [int(num) for num in line.split()]
-            for line in chunk.splitlines()[1:]
+            [int(d), int(s), int(l)] 
+            for (d, s, l) in 
+            [line.split() for line in chunk.splitlines()[1:]]
         ])
         for chunk in maps
     ]
 
-    print(solve1(seeds, *maps))
-    print(solve2(seeds, *maps))
+    reverse = [
+        mapper([
+            [int(s), int(d), int(l)] 
+            for (d, s, l) in 
+            [line.split() for line in chunk.splitlines()[1:]]
+        ])
+        for chunk in reversed(maps)
+    ]
+
+    print(solve1(seeds, *forward))
+    print(solve2(seeds, *reverse))
 
 
 if __name__ == '__main__':
