@@ -16,7 +16,10 @@ def solve(races):
 def main():
     time, distance = open('input.txt').read().split('\n')
 
-    races = zip(map(int, time.split()[1:]), map(int, distance.split()[1:]))
+    races = zip(
+        map(int, time.split()[1:]), 
+        map(int, distance.split()[1:])
+    )
 
     time = int(time.split(':')[1].replace(' ', ''))
     distance = int(distance.split(':')[1].replace(' ', ''))
