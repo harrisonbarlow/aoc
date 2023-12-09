@@ -1,4 +1,5 @@
 from functools import reduce
+from itertools import count
 
 def chain(start, *funcs):
     return reduce(lambda res, func: func(res), funcs, start)
@@ -8,7 +9,7 @@ def mapper(map):
     def func(number):
         for destination, source, length in map:
             if source <= number < source + length:
-                return destination + (number - source)
+                return destination + number - source
             
         return number
 
@@ -16,19 +17,12 @@ def mapper(map):
 
 
 def solve2(seeds, *maps):
-    location = 0
-
-    while True:
+    for location in count():
         possible_seed = chain(location, *maps)
 
-        for i in range(0, len(seeds), 2):
-            seed = seeds[i]
-            count = seeds[i + 1]
-
-            if seed <= possible_seed < seed + count:
+        for seed, num in zip(seeds[::2], seeds[1::2]):
+            if seed <= possible_seed < seed + num:
                 return location
-
-        location += 1
 
 
 def solve1(seeds, *maps):

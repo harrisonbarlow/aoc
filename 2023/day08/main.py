@@ -1,12 +1,12 @@
 import re
-from itertools import cycle, count
+from itertools import cycle
 from math import lcm
 
 
 def traverse(instructions, network, start, end):
     node = start
 
-    for step, direction in zip(count(0), cycle(instructions)):
+    for step, direction in enumerate(cycle(instructions)):
         if node in end:
             return step
 
@@ -16,18 +16,19 @@ def traverse(instructions, network, start, end):
 def main():
     instructions, _, *nodes = open('input.txt').read().split('\n')
 
-    network = {}
-
-    for line in nodes:
-        node, left, right = re.findall(r'\w+', line)
-
-        network[node] = {'L': left, 'R': right}
+    network = {
+        name: {'L': left, 'R': right}
+        for name, left, right in [
+            re.findall(r'\w+', node)
+            for node in nodes
+        ]
+    }
 
     starts = [node for node in network if node.endswith('A')]
-    ends = [node for node in network if node.endswith('Z')]
+    ends   = [node for node in network if node.endswith('Z')]
 
     print(traverse(instructions, network, 'AAA', ['ZZZ']))
-    print(lcm(*(traverse(instructions, network, start, ends) for start in starts)))
+    print(lcm(*[traverse(instructions, network, start, ends) for start in starts]))
 
 
 if __name__ == '__main__':
